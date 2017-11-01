@@ -9,6 +9,11 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,11 +54,43 @@ public class MainActivity extends AppCompatActivity {
         btnSalvar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Salvando...", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                findViewById(R.id.includemain).setVisibility(View.VISIBLE);
-                findViewById(R.id.includecadastro).setVisibility(View.INVISIBLE);
-                findViewById(R.id.fab).setVisibility(View.VISIBLE);
+
+                //carregando os campos
+                EditText txtNome = findViewById(R.id.txtNome);
+                Spinner spnEstados = findViewById(R.id.spUf);
+                RadioGroup rgSexo = findViewById(R.id.rgSexo);
+                CheckBox chkVip = findViewById(R.id.cbVip);
+
+                //pegando valores
+                String nome = txtNome.getText().toString();
+                String uf = spnEstados.getSelectedItem().toString();
+                boolean vip = chkVip.isChecked();
+                String sexo = rgSexo.getCheckedRadioButtonId() == R.id.rbMasculino ? "M" : "F";
+
+                ClienteDAO dao = new ClienteDAO(getBaseContext());
+                boolean sucesso = dao.salvar(nome, sexo, uf, vip);
+
+                if(sucesso)
+                {
+                    //limpa campos
+                    txtNome.setText("");
+                    rgSexo.setSelected(false);
+                    spnEstados.setSelection(0);
+                    chkVip.setChecked(false);
+
+                    Snackbar.make(view, "Salvou!", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+
+                    findViewById(R.id.includemain).setVisibility(View.VISIBLE);
+                    findViewById(R.id.includecadastro).setVisibility(View.INVISIBLE);
+                    findViewById(R.id.fab).setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    Snackbar.make(view, "Erro ao salvar, consulte os logs!", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+
+                }
             }
         });
 

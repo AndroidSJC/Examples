@@ -111,7 +111,7 @@
         app:layout_constraintGuide_begin="159dp" />
 
     <CheckBox
-        android:id="@+id/checkBox"
+        android:id="@+id/cbVip"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
