@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">SQLiteCRUD</string>
     <string name="action_settings">Settings</string>
+    <string name="txtNomeHint">Digite o nome do cliente</string>
+    <string name="rbSexoMasculino">Masculino</string>
+    <string name="rbSexoFeminino">Feminino</string>
+    <string name="tvSexo">Sexo:</string>
+    <string name="tvUf">UF:</string>
+    <string name="cbVip">VIP</string>
+    <string name="btnCancelar">Cancelar</string>
+    <string name="btnSalvar">Salvar</string>
 </resources>
