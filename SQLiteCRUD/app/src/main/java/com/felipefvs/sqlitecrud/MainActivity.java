@@ -1,5 +1,6 @@
 package com.felipefvs.sqlitecrud;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -23,10 +24,37 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     ClienteAdapter adapter;
 
+    Cliente clienteEditado = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //verifica se começou agora ou se veio de uma edição
+        Intent intent = getIntent();
+        if(intent.hasExtra("cliente")){
+            findViewById(R.id.includemain).setVisibility(View.INVISIBLE);
+            findViewById(R.id.includecadastro).setVisibility(View.VISIBLE);
+            findViewById(R.id.fab).setVisibility(View.INVISIBLE);
+            clienteEditado = (Cliente) intent.getSerializableExtra("cliente");
+            EditText txtNome = findViewById(R.id.txtNome);
+            Spinner spnEstado = findViewById(R.id.spUf);
+            CheckBox chkVip = findViewById(R.id.cbVip);
+
+            txtNome.setText(clienteEditado.getNome());
+            chkVip.setChecked(clienteEditado.isVip());
+            spnEstado.setSelection(getIndex(spnEstado, clienteEditado.getUf()));
+            if(clienteEditado.getSexo() != null){
+                RadioButton rb;
+                if(clienteEditado.getSexo().equals("M"))
+                    rb = findViewById(R.id.rbMasculino);
+                else
+                    rb = findViewById(R.id.rbFeminino);
+                rb.setChecked(true);
+            }
+        }
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -74,12 +102,26 @@ public class MainActivity extends AppCompatActivity {
                 String sexo = rgSexo.getCheckedRadioButtonId() == R.id.rbMasculino ? "M" : "F";
 
                 ClienteDAO dao = new ClienteDAO(getBaseContext());
-                boolean sucesso = dao.salvar(nome, sexo, uf, vip);
+                boolean sucesso;
+
+                if(clienteEditado != null) {
+                    sucesso = dao.salvar(clienteEditado.getId(), nome, sexo, uf, vip);
+                }
+                else
+                {
+                    sucesso = dao.salvar(nome, sexo, uf, vip);
+                }
 
                 if(sucesso)
                 {
                     Cliente cliente = dao.retornarUltimo();
-                    adapter.adicionarCliente(cliente);
+
+                    if(clienteEditado != null){
+                        adapter.atualizarCliente(cliente);
+                        clienteEditado = null;
+                    }else {
+                        adapter.adicionarCliente(cliente);
+                    }
 
                     //limpa campos
                     txtNome.setText("");
@@ -138,5 +180,17 @@ public class MainActivity extends AppCompatActivity {
         adapter = new ClienteAdapter(dao.retornarTodos());
         recyclerView.setAdapter(adapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+    }
+
+    private int getIndex(Spinner spinner, String myString)
+    {
+        int index = 0;
+        for (int i=0;i<spinner.getCount();i++){
+            if (spinner.getItemAtPosition(i).toString().equalsIgnoreCase(myString)){
+                index = i;
+                break;
+            }
+        }
+        return index;
     }
 }

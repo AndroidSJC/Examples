@@ -20,15 +20,20 @@ public class ClienteDAO {
         gw = DbGateway.getInstance(context);
     }
 
-    public boolean salvar(String nome, String sexo, String uf, boolean vip)
-    {
+    public boolean salvar(String nome, String sexo, String uf, boolean vip){
+        return salvar(0, nome, sexo, uf, vip);
+    }
+
+    public boolean salvar(int id, String nome, String sexo, String uf, boolean vip){
         ContentValues cv = new ContentValues();
         cv.put("Nome", nome);
         cv.put("Sexo", sexo);
         cv.put("UF", uf);
         cv.put("Vip", vip ? 1 : 0);
-
-        return gw.getDatabase().insert(TABLE_CLIENTES, null, cv) > 0;
+        if(id > 0)
+            return gw.getDatabase().update(TABLE_CLIENTES, cv, "ID=?", new String[]{ id + "" }) > 0;
+        else
+            return gw.getDatabase().insert(TABLE_CLIENTES, null, cv) > 0;
     }
 
     public List<Cliente> retornarTodos(){
